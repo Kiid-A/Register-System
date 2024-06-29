@@ -6,7 +6,7 @@ package Model;
  * @date:
  */
 public class MedicalRecord {
-    String id;
+    String recordId;
     String title;
     String content;
 }
