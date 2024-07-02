@@ -39,4 +39,9 @@ public class User {
     public String getPassword() {
         return password;
     }
+
+    @Override
+    public String toString() {
+        return new String("id = " + this.id + ", name = " + this.name + ", address = " + this.address + ", tel = " + this.tel);
+    }
 }

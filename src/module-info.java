@@ -3,9 +3,10 @@ module hospital {
     requires javafx.fxml;
     requires java.sql;
     requires javafx.swing;
-    requires static lombok;
+    requires junit;
 
 
     opens Main to javafx.fxml;
-    exports Main to javafx.graphics;
+    exports Main to javafx.graphics, junit;
+    exports Test to junit;
 }

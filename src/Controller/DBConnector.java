@@ -6,6 +6,8 @@ import Model.Doctor;
 import Model.Patient;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -17,6 +19,13 @@ public class DBConnector {
     private static volatile DBConnector instance = null;
     private Connection conn = null;
     private Statement statement;
+
+    public String getTime(LocalDateTime l) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String res = l.format(formatter);
+
+        return res;
+    }
 
     /**
      * 加载mysql驱动
@@ -109,7 +118,7 @@ public class DBConnector {
         ArrayList<Doctor> d = new ArrayList<Doctor>();
         try {
             ResultSet r = statement.executeQuery("select * from doctor");
-            if (r.next()) {
+            while (r.next()) {
                 d.add(new Doctor(r));
             }
             return d;
@@ -118,27 +127,118 @@ public class DBConnector {
         }
     }
 
+    public ArrayList<Patient> getPatient(String doctorId) {
+        ArrayList<Patient> p = new ArrayList<Patient>();
+        try {
+            ResultSet r = statement.executeQuery("select * from patient where doctor_id =" + doctorId);
+            while (r.next()) {
+                p.add(new Patient(r));
+            }
+            return p;
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    public void insertAdmin(Admin a) throws SQLException {
+        String sql = "insert into admin(id, name, address, tel, created_at, deleted_at) " +
+                "values(?,?,?,?,?,?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, a.getId());
+        ps.setString(2, a.getName());
+        ps.setString(3, a.getAddress());
+        ps.setString(4, a.getTel());
+        ps.setString(5, getTime(LocalDateTime.now()));
+        ps.setString(6, null);
+
+        ps.execute();
+    }
+
+    public void insertDoctor(Doctor d) throws SQLException {
+        String sql = "insert into doctor(id, name, age, gender, address, tel, hospital, " +
+                "department, title, speciality, created_at, deleted_at) " +
+                "values(?,?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, d.getId());
+        ps.setString(2, d.getName());
+        ps.setString(3, d.getAge());
+        ps.setString(4, d.getGender());
+        ps.setString(5, d.getAddress());
+        ps.setString(6, d.getTel());
+        ps.setString(7, d.getHospital());
+        ps.setString(8, d.getDepartment());
+        ps.setString(9, d.getTitle());
+        ps.setString(10, d.getSpeciality());
+        ps.setString(11, getTime(LocalDateTime.now()));
+        ps.setString(12, null);
+
+        ps.execute();
+    }
+
+    public void insertPatient(Patient p) throws SQLException {
+        String sql = "insert into patient(id, name, age, gender, address, tel, " +
+                "created_at, deleted_at) " +
+                "values(?,?,?,?,?,?,?,?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, p.getId());
+        ps.setString(2, p.getName());
+        ps.setString(3, p.getAge());
+        ps.setString(4, p.getGender());
+        ps.setString(5, p.getAddress());
+        ps.setString(6, p.getTel());
+        ps.setString(7, getTime(LocalDateTime.now()));
+        ps.setString(8, null);
+
+        ps.execute();
+    }
+
     public void modifyAdminInfo(Admin a) throws SQLException {
-        String upd = "update admin set name='" + a.getName() + "',address='" + a.getAddress() + "',tel='" + a.getTel() + "',password='" + a.getPassword() + "' where id='" + a.getId() + "'";
-        statement.executeUpdate(upd);
+        String sql = "update admin set name=?, address=?, tel=?, password=?, created_at=? " +
+                "where id = '" + a.getId() + "'";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, a.getName());
+        ps.setString(2, a.getAddress());
+        ps.setString(3, a.getTel());
+        ps.setString(4, a.getPassword());
+        ps.setString(5, getTime(LocalDateTime.now()));
+
+        ps.executeUpdate();
     }
 
     public void modifyPatientInfo(Patient p) throws SQLException {
-        String upd = "update patient set name='" + p.getName() +
-                "',age = '" + p.getAge() + "',gender = '" + p.getGender() +
-                "',address='" + p.getAddress() + "',tel='" + p.getTel() +
-                "',password='" + p.getPassword() + "' where id='" + p.getId() + "'";
-        statement.executeUpdate(upd);
+        String sql = "update patient set name=?, age=?, gender=?, address=?, tel=?, password=?, created_at=? " +
+                "where id = '" + p.getId() + "'";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, p.getName());
+        ps.setString(2, p.getAge());
+        ps.setString(3, p.getGender());
+        ps.setString(4, p.getAddress());
+        ps.setString(5, p.getTel());
+        ps.setString(6, p.getPassword());
+        ps.setString(7, getTime(LocalDateTime.now()));
+
+        ps.executeUpdate();
     }
 
     public void modifyDoctorInfo(Doctor d) throws SQLException {
-        String upd = "update doctor set name='" + d.getName() +
-                "',age = '" + d.getAge() + "',gender = '" + d.getGender() +
-                "',address='" + d.getAddress() + "',tel='" + d.getTel() +
-                "',password='" + d.getPassword() + "',hospital = '" + d.getHospital() +
-                "',department='" + d.getDepartment() + "',title = '" + d.getTitle() +
-                "',speciality='" + d.getSpeciality() + "' where id='" + d.getId() + "'";
-        statement.executeUpdate(upd);
+        String sql = "update doctor set name=?, age=?, gender=?, address=?, tel=?, " +
+                "password=?, created_at=?, hospital=?, department=?, title=?, speciality=? " +
+                "where id = '" + d.getId() + "'";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, d.getName());
+        ps.setString(2, d.getAge());
+        ps.setString(3, d.getGender());
+        ps.setString(4, d.getAddress());
+        ps.setString(5, d.getTel());
+        ps.setString(6, d.getPassword());
+        ps.setString(7, getTime(LocalDateTime.now()));
+        ps.setString(8, d.getHospital());
+        ps.setString(9, d.getDepartment());
+        ps.setString(10, d.getTitle());
+        ps.setString(11, d.getSpeciality());
+
+        ps.executeUpdate();
     }
 
     public void deleteAdmin(String id) throws SQLException {
@@ -157,27 +257,26 @@ public class DBConnector {
     }
 
     public void insertAttendance(Attendance a) throws SQLException {
-        String c = "select * from attendance where doctor_id = '" + a.getDoctorId() + "'";
-        ResultSet r = statement.executeQuery(c);
-        r.last();
-        Integer cnt = r.getRow();
-
         String sql = "insert into attendance(doctor_id, from_time, to_time, patient_id, " +
-                "department, register_time, people_num, id)" + "values(?,?,?,?,?,?,?,?,?)";
+                "department, register_time, people_num, created_at, deleted_at)" +
+                "values(?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, a.getDoctorId());
-        ps.setDate(2, new Date(a.getFrom().getTime()));
-        ps.setDate(3, new Date(a.getTo().getTime()));
+        ps.setString(2, a.getFrom());
+        ps.setString(3, a.getTo());
         ps.setString(4, a.getPatientId());
         ps.setString(5, a.getDepartment());
-        ps.setString(6, a.getDepartment());
-        ps.setDate(7, new Date(a.getRegisterTime().getTime()));
-        ps.setInt(8, a.getPeopleNum());
-        ps.setInt(9, cnt + 1);
+        ps.setString(6, a.getRegisterTime());
+        ps.setInt(7, a.getPeopleNum());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String now = currentDateTime.format(formatter);
+        ps.setString(8, now);
+        ps.setDate(9, null);
 
         ps.execute();
     }
-    
+
     public ArrayList<Attendance> attendanceViaDoctor(String doctorId) throws SQLException {
         String sql = "select * from attendance where doctor_id='" + doctorId + "'";
         ArrayList<Attendance> res = new ArrayList<Attendance>();
@@ -187,7 +286,8 @@ public class DBConnector {
                 res.add(new Attendance(r));
             }
         } catch (SQLException e) {
-            return null;   
+            e.printStackTrace();
+            return null;
         }
         return res;
     }
@@ -198,5 +298,37 @@ public class DBConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Attendance> getTimeOrderAttendance(String doctorId) throws SQLException {
+        String sql = "select * from attendance where doctor_id='" + doctorId + "' order by register_time desc";
+        ArrayList<Attendance> res = new ArrayList<>();
+        try {
+            ResultSet r = statement.executeQuery(sql);
+            while(r.next()) {
+                res.add(new Attendance(r));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return res;
+    }
+
+    public ArrayList<Attendance> getPeriodAttendance(String doctorId, Date from, Date to) throws SQLException {
+        String sql = "select * from attendance where doctor_id='" + doctorId + "' and register_time between ? and ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setDate(1, from);
+        ps.setDate(2, to);
+        ArrayList<Attendance> res = new ArrayList<Attendance>();
+        try {
+            ResultSet r = ps.executeQuery();
+            while(r.next()) {
+                res.add(new Attendance(r));
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+        return res;
     }
 }

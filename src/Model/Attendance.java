@@ -2,7 +2,6 @@ package Model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * @Description:
@@ -12,14 +11,14 @@ import java.util.Date;
 public class Attendance {
     private String attendanceId;
     private String doctorId;
-    private Date from;
-    private Date to;
+    private String from;
+    private String to;
     private String patientId;
     private String department;
-    private Date registerTime;
+    private String registerTime;
     private Integer peopleNum;
 
-    public Attendance(String doctorId, Date from, Date to, String patientId, String department, Date registerTime, Integer peopleNum) {
+    public Attendance(String doctorId, String from, String to, String patientId, String department, String registerTime, Integer peopleNum) {
         this.doctorId = doctorId;
         this.from = from;
         this.to = to;
@@ -31,11 +30,11 @@ public class Attendance {
 
     public Attendance(ResultSet r) throws SQLException {
         this.doctorId = r.getString("doctor_id");
-        this.from = r.getDate("from");
-        this.to = r.getDate("to");
+        this.from = r.getString("from_time");
+        this.to = r.getString("to_time");
         this.patientId = r.getString("patient_id");
         this.department = r.getString("department");
-        this.registerTime = r.getDate("register_time");
+        this.registerTime = r.getString("register_time");
         this.peopleNum = r.getInt("people_num");
     }
 
@@ -43,11 +42,11 @@ public class Attendance {
         return doctorId;
     }
 
-    public Date getFrom() {
+    public String getFrom() {
         return from;
     }
 
-    public Date getTo() {
+    public String getTo() {
         return to;
     }
 
@@ -59,12 +58,18 @@ public class Attendance {
         return department;
     }
 
-    public Date getRegisterTime() {
+    public String getRegisterTime() {
         return registerTime;
     }
 
     public Integer getPeopleNum() {
         return peopleNum;
+    }
+
+    @Override
+    public String toString() {
+        return new String("doctorId = " + this.doctorId + "from = " + this.from +
+                "to = " + this.to + "patient id = " + this.patientId + "department = " + this.department);
     }
 }
 

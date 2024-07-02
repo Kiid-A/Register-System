@@ -12,14 +12,16 @@ import java.sql.SQLException;
 public class Patient extends User {
     private String age;
     private String gender;
+    private String doctorId;
     private MedicalRecord medicalRecord;
 
     public Patient(String id, String name, String address, String tel,
-                   String age, String gender, MedicalRecord medicalRecord) {
+                   String age, String gender, String doctorId) {
        super(id, name, address, tel);
        this.age = age;
        this.gender = gender;
-       this.medicalRecord = medicalRecord;
+       this.doctorId = doctorId;
+//       this.medicalRecord = medicalRecord;
     }
 
     public Patient(ResultSet r) throws SQLException {
@@ -38,5 +40,9 @@ public class Patient extends User {
 
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
     }
 }
